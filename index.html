@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Damir Samarin - Pardavimų specialistas">
+    <title>Damir Samarin - Pardavimai</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e3c2f 0%, #2d5a3d 50%, #1a352b 100%);
+            color: #333;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .notch {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 15px 15px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notch::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .notch::after {
+            content: '';
+            width: 12px;
+            height: 3px;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 120px;
+        }
+
+        .dock {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 15px 25px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dock-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(46, 125, 50, 0.8);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dock-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+            border-radius: 12px;
+        }
+
+        .dock-icon:hover {
+            transform: translateY(-10px) scale(1.1);
+            background: rgba(56, 142, 60, 0.9);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .dock-icon.active {
+            background: linear-gradient(135deg, #2e7d32, #388e3c);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 80px 0 40px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .page.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mac-window {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mac-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: rgba(248, 249, 250, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .mac-buttons {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .mac-button {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .mac-button.red { background: #ff5f57; }
+        .mac-button.yellow { background: #ffbd2e; }
+        .mac-button.green { background: #28ca42; }
+
+        .window-content {
+            padding: 60px 60px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 100px 0;
+        }
+
+        .hero-image {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            margin: 0 auto 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            animation: float 6s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(-45deg);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(-45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(-45deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero h1 {
+            font-size: 4.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #e8f5e8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            font-size: 1.5em;
+            margin-bottom: 50px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 18px 45px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 15px 35px rgba(46, 125, 50, 0.3);
+            font-family: 'SF Pro Display', sans-serif;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 45px rgba(46, 125, 50, 0.4);
+            background: linear-gradient(135deg, #388e3c, #66bb6a);
+        }
+
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .about-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+        }
+
+        .about-text h2 {
+            font-size: 2.8em;
+            margin-bottom: 25px;
+            color: #333;
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .philosophy-box {
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.1));
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 4px solid #2e7d32;
+            font-style: italic;
+            color: #333;
+        }
+
+        .experience-timeline {
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .experience-timeline::before {
+            content: '';
+            position: absolute;
+            left: 25px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            padding-left: 50px;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.6s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.8s; }
+        .timeline-item:nth-child(6) { animation-delay: 1s; }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 15px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.9), 0 3px 10px rgba(46, 125, 50, 0.3);
+        }
+
+        .timeline-year {
+            color: #2e7d32;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .timeline-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .timeline-company {
+            color: #4caf50;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .timeline-description {
+            color: #666;
+            line-height: 1.7;
+        }
+
+        .timeline-description ul {
+            margin-top: 10px;
+            margin-left: 20px;
+        }
+
+        .timeline-description li {
+            margin: 5px 0;
+        }
+
+        .swot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .swot-category {
+            padding: 40px 30px;
+            border-radius: 20px;
+            color: white;
+            transform: translateY(30px);
+            opacity: 0;
+            animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swot-category.strengths {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+        }
+
+        .swot-category.weaknesses {
+            background: linear-gradient(135deg, #f57c00, #ff9800);
+        }
+
+        .swot-category.opportunities {
+            background: linear-gradient(135deg, #1976d2, #2196f3);
+        }
+
+        .swot-category.threats {
+            background: linear-gradient(135deg, #c62828, #e53935);
+        }
+
+        .swot-category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+            border-radius: 20px;
+        }
+
+        .swot-category:nth-child(2) { animation-delay: 0.2s; }
+        .swot-category:nth-child(3) { animation-delay: 0.4s; }
+        .swot-category:nth-child(4) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .swot-category h3 {
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .swot-list {
+            list-style: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .swot-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .swot-list li:last-child {
+            border-bottom: none;
+        }
+
+        .swot-intro {
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.1));
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border-left: 4px solid #2e7d32;
+            font-style: italic;
+            color: #555;
+            text-align: center;
+        }
+
+        .contact-content {
+            text-align: center;
+            color: white;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 100px 0;
+        }
+
+        .contact-content h2 {
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: -2px;
+        }
+
+        .contact-content p {
+            font-size: 1.4em;
+            margin-bottom: 50px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+
+        .contact-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 3em;
+            margin-bottom: 40px;
+            color: #333;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2em;
+            }
+
+            .hero p {
+                font-size: 1.1em;
+                margin-bottom: 35px;
+            }
+
+            .cta-button {
+                font-size: 0.95em;
+                padding: 15px 35px;
+            }
+
+            .window-content {
+                padding: 45px 20px 25px;
+            }
+
+            .about-text {
+                font-size: 0.95em;
+                line-height: 1.5;
+            }
+
+            .about-text h2 {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+                line-height: 1.1;
+            }
+
+            .about-text p {
+                margin-bottom: 15px;
+            }
+
+            .philosophy-box {
+                padding: 18px;
+                margin: 18px 0;
+                font-size: 0.9em;
+                line-height: 1.4;
+            }
+
+            .section-title {
+                font-size: 1.8em;
+                margin-bottom: 25px;
+                line-height: 1.1;
+            }
+
+            .timeline-item {
+                padding-left: 30px;
+                margin-bottom: 30px;
+            }
+
+            .timeline-year {
+                font-size: 0.9em;
+                margin-bottom: 5px;
+            }
+
+            .timeline-title {
+                font-size: 1.15em;
+                margin-bottom: 5px;
+                line-height: 1.2;
+            }
+
+            .timeline-company {
+                font-size: 0.95em;
+                margin-bottom: 10px;
+            }
+
+            .timeline-description {
+                font-size: 0.9em;
+                line-height: 1.4;
+            }
+
+            .timeline-description ul {
+                margin-top: 8px;
+                margin-left: 18px;
+            }
+
+            .timeline-description li {
+                margin: 3px 0;
+            }
+
+            .swot-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+                margin-top: 25px;
+            }
+
+            .swot-category {
+                padding: 22px 18px;
+            }
+
+            .swot-category h3 {
+                font-size: 1.25em;
+                margin-bottom: 12px;
+                line-height: 1.2;
+            }
+
+            .swot-list li {
+                padding: 7px 0;
+                font-size: 0.9em;
+                line-height: 1.4;
+            }
+
+            .swot-intro {
+                padding: 15px;
+                margin-bottom: 20px;
+                font-size: 0.9em;
+                line-height: 1.4;
+            }
+
+            .contact-content {
+                padding: 70px 0;
+            }
+
+            .contact-content h2 {
+                font-size: 2.2em;
+                margin-bottom: 25px;
+                line-height: 1.1;
+            }
+
+            .contact-links {
+                gap: 15px;
+            }
+
+            .contact-link {
+                padding: 14px 28px;
+                font-size: 0.95em;
+            }
+
+            .dock {
+                padding: 10px 15px;
+                gap: 8px;
+            }
+
+            .dock-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 15px;
+            }
+
+            .notch {
+                width: 140px;
+                height: 24px;
+            }
+
+            .hero-image {
+                width: 180px;
+                height: 180px;
+                margin: 0 auto 30px;
+            }
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 9998;
+        }
+
+        .scroll-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #2e7d32, #4caf50);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="notch"></div>
+
+    <div class="scroll-indicator">
+        <div class="scroll-progress"></div>
+    </div>
+
+    <div class="dock">
+        <div class="dock-icon active" data-page="hero" title="Pradžia">🏠</div>
+        <div class="dock-icon" data-page="about" title="Filosofija">💭</div>
+        <div class="dock-icon" data-page="experience" title="Patirtis">💼</div>
+        <div class="dock-icon" data-page="swot" title="SWOT Analizė">📊</div>
+        <div class="dock-icon" data-page="contact" title="Kontaktai">📞</div>
+    </div>
+
+    <div class="container">
+        <div class="page visible" id="hero">
+            <div class="hero">
+                <div class="hero-image" style="background-image: url('https://z-p3-scontent.fvno1-1.fna.fbcdn.net/v/t39.30808-6/561878488_1502759590997055_7845400216529252909_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=aAQYNljsAQ8Q7kNvwECNJzm&_nc_oc=AdmtMyY7EUtyXIdglCo3StT_R7mlLzFsyH9VY4AzDxeQgTqU_OHGsUKlYexsgsZIfPEVnO8HIOU_73zMtK-Pyi20&_nc_zt=23&_nc_ht=z-p3-scontent.fvno1-1.fna&_nc_gid=DoOgZmVN0lIrDMd2bTbKuA&oh=00_AffnRaefBuQ9Q_rhJbjY0iSceGB6bHUV59C0rBX7dpcMgw&oe=68FBAB57'); background-size: cover; background-position: center;"></div>
+                <h1>Damir Samarin</h1>
+                <p>Pardavimų vadybininkas</p>
+                <button class="cta-button" onclick="scrollToSection('about')">Susipažinti su mano pardavimų patirtimi</button>
+            </div>
+        </div>
+
+        <div class="page" id="about">
+            <div class="mac-window">
+                <div class="mac-buttons">
+                    <div class="mac-button red"></div>
+                    <div class="mac-button yellow"></div>
+                    <div class="mac-button green"></div>
+                </div>
+                <div class="window-content">
+                    <div class="about-text" style="max-width: 100%;">
+                        <h2>Pardavimai yra visur.</h2>
+                            <p>Beveik viskas gyvenime yra pardavimai. Skiriasi tik pardavimo technikos, valiuta ir mūsų "prekių" pirkėjai.</p>
+                            
+                            <div class="philosophy-box">
+                                "Netikite? Leiskite jus nukelti į vaikystę, kai kieme ieškojome draugų, juk turėjome mokėti save parduoti. Arba norėjome nakvoti pas draugą, taip pat turėjome mokėti parduoti šią idėją tėvelaims. Pardavimai nesibaigia ir mums užaugus. Net ir dabar kurdamas šį CV iš esmės turiu mokėti save parduoti."
+                            </div>
+                            
+                            <p>Dauguma žmonių turbūt nelaiko savęs pardavėjais, bet pažvelgus giliau, tai yra reikšminga visų mūsų gyvenimo dalis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="experience">
+            <div class="mac-window">
+                <div class="mac-buttons">
+                    <div class="mac-button red"></div>
+                    <div class="mac-button yellow"></div>
+                    <div class="mac-button green"></div>
+                </div>
+                <div class="window-content">
+                    <h2 class="section-title">Mano patirtis pardavimuose</h2>
+                    <div class="experience-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-year">2025 Rugsėjis - Dabar</div>
+                            <div class="timeline-title">Pardavimų vadybininkas</div>
+                            <div class="timeline-company">Digi1</div>
+                            <div class="timeline-description">
+                                <ul>
+                                    <li>Individualios korepetitorių pamokos</li>
+                                    <li>Pardavimai telefonu</li>
+                                    <li>Objection handling</li>
+                                    <li>Darbas didesniame kolektyve</li>
+                                    <li>Darbas su CRM sistema</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-year">2025 Rugpjūtis</div>
+                            <div class="timeline-title">Šalti skambučiai</div>
+                            <div class="timeline-company">Marketingo agentūra</div>
+                            <div class="timeline-description">
+                                Pardavimų ir lead'ų generavimas per šaltus skambučius. Klientų poreikių identifikavimas ir susitikimų organizavimas.
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-year">2023 - Dabar</div>
+                            <div class="timeline-title">Bendraįkūrėjas</div>
+                            <div class="timeline-company">UAB Brailis</div>
+                            <div class="timeline-description">
+                                <ul>
+                                    <li>Stalo žaidimas neregiams ir matantiems - "Brailing"</li>
+                                    <li>Masinė gamyba ir išankstiniai užsakymai</li>
+                                    <li>Darbas su investuotojais</li>
+                                    <li>Gyvi pardavimai mokykloms</li>
+                                    <li>Šalti skambučiai</li>
+                                    <li>Prezentacijos verslų savininkams</li>
+                                    <li>Internetinė prekyba</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-year">2022 - 2023</div>
+                            <div class="timeline-title">Mokomoji bendrovė</div>
+                            <div class="timeline-company">Lietuvos Junior Achievement</div>
+                            <div class="timeline-description">
+                                <ul>
+                                    <li>Idėjos generavimas ir rinkos tyrimas</li>
+                                    <li>Prototipų ir produkto kūrimas</li>
+                                    <li>Marketingas</li>
+                                    <li>Finansų siekimas</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-year">2021 - 2022 Vasaros</div>
+                            <div class="timeline-title">Pardavėjas ir Administratorius</div>
+                            <div class="timeline-company">NugaBest Mažeikiai</div>
+                            <div class="timeline-description">
+                                <ul>
+                                    <li>Darbas masažinės įrangos salone (vasaros sezonas)</li>
+                                    <li>Administracinė patirtis: klientų registracija</li>
+                                    <li>Pardaviminių / sveikatos žinių prezentacijų vedimas</li>
+                                    <li>1-1 su klientais: interviu apie problemas, pardaviminis pokalbis, prekių pristatymas ir rekomendacija</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="swot">
+            <div class="mac-window">
+                <div class="mac-buttons">
+                    <div class="mac-button red"></div>
+                    <div class="mac-button yellow"></div>
+                    <div class="mac-button green"></div>
+                </div>
+                <div class="window-content">
+                    <h2 class="section-title">SWOT Analizė</h2>
+                    <div class="swot-intro">
+                        "Mes žmonės retai, kada esame savikritiški. Todėl paprašiau D.I. pagalbos, nes su juo dirbu nemažai, tad jis net gasdinančiai gerai mane pažįsta."
+                    </div>
+                    <div class="swot-grid">
+                        <div class="swot-category strengths">
+                            <h3>💪 Stiprybės</h3>
+                            <ul class="swot-list">
+                                <li>Esu iniciatyvus ir nelaukiu, kol man bus pasakyta, ką daryti – veikiu pats</li>
+                                <li>Aš gerai bendrauju su įvairiais žmonėmis ir greitai užsitarnauju jų pasitikėjimą</li>
+                                <li>Puikiai kalbu viešai (Parodos, pranešimai, televizija)</li>
+                                <li>Man labai svarbi misija, aukštesnis tikslas, pagalba žmonėms. Sveikatos srityje tai yra - vadinasi būsiu dar labiau motyvuotas</li>
+                                <li>Aš greitai mokausi ir gerai priimu kritiką, atitinkamai keičiuosi</li>
+                                <li>Aš natūraliai prisiimu atsakomybę, todėl žmonės linkę manimi pasitikėti, net jei jie yra vyresni</li>
+                                <li>Išlieku ramus ir nepanikuoju stresinėse situacijose, moku dirbti įtemptose situacijose su ribotais ištekliais (laiko, finansų)</li>
+                                <li>Turiu B kategoriją</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="swot-category weaknesses">
+                            <h3>⚠️ Silpnybės</h3>
+                            <ul class="swot-list">
+                                <li>Aš paprastai judu greičiau nei dauguma žmonių, ir jei kas nors sulėtėja, kartais įsikišu ir perimu iniciatyvą, užuot laukęs</li>
+                                <li>Neturiu daug patirties labai struktūrizuotoje korporacijos aplinkoje, todėl vertinu aiškumą dėl sistemų ir lūkesčių nuo pat pradžių</li>
+                                <li>Esu labai orientuotas į efektyvumą, veiksmus ir rezultatus, todėl kartais praleidžiu dokumentaciją, jeigu nėra aiškiosios vertės</li>
+                                <li>Lėtas sprendimų priėmimas ir pernelyg abstrakti komunikacija mane gali erzintinti, ir nebūti suprantama, todėl geriausiai dirbu, kai turiu laisvę ir aiškų tikslą</li>
+                                <li>Neturiu daug metų patirties, išsilavinimo</li>
+                                <li>Negaliu įsipareigoti, kad dirbsiu metus ar daugiau. Gyvenimo tempas aukštas, visada žiūriu į priekį, jei užaugu batus iš karto dairausi didesnių</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="swot-category opportunities">
+                            <h3>🚀 Galimybės</h3>
+                            <ul class="swot-list">
+                                <li>Mano gebėjimas komunikuoti ir užmegzti ryšį su įvairiais žmonėmis gali padėti kurti santykius su klientais, ir partneriais</li>
+                                <li>Anatomija, žmogaus sveikata - mane labai intriguojančios temos. Todėl turėsiu papildomą motyvaciją mokintis ir tobulėti</li>
+                                <li>Kaip būdinga jauniems žmonėms galiu atnešti kitokią perspektyvą ir naujų idėjų</li>
+                                <li>Aš neieškau tik darbo – noriu atsakomybės, geriausių vadovų iš kurių galėsiu mokytis ir augimo galimybės</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="swot-category threats">
+                            <h3>⚡ Grėsmės</h3>
+                            <ul class="swot-list">
+                                <li>Jei per adaptacinį laikotarpį negausiu gero apmokymo, spragas užtaisysiu savo ambicija ir iniciatyva o tai gali atvesti prie klaidų</li>
+                                <li>Nesu geras veidmainis, tad man labai svarbus tikras santykis ir ryšys su kitais komandos nariais</li>
+                                <li>Man geriausiai sekasi, kai jaučiu pasitikėjimą iš vadovų. "Micromanagement" mane slopina</li>
+                                <li>Galiu per daug savimi pasitikėti, prisiimti per daug atsakomybių ar įsipareigoti per dideliems tikslams. Mano pastangos nekviestionuojamos, bet gali būti problemų su objektyvios realybės vertinimu, per dideliu pozityvumu</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="contact">
+            <div class="contact-content">
+                <h2>Kontaktai</h2>
+                <div class="contact-links">
+                    <a href="tel:+37064897710" class="contact-link">📞 +370 648 97710</a>
+                    <a href="mailto:damirsamarin.77@gmail.com" class="contact-link">📧 El. paštas</a>
+                    <a href="https://www.linkedin.com/in/damir-samarin-433088277/" class="contact-link" target="_blank">💼 LinkedIn</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pages = document.querySelectorAll('.page');
+        const dockIcons = document.querySelectorAll('.dock-icon');
+        const scrollProgress = document.querySelector('.scroll-progress');
+
+        let currentPageIndex = 0;
+        let isScrolling = false;
+
+        function updatePageVisibility() {
+            const scrollTop = window.scrollY;
+            const windowHeight = window.innerHeight;
+            
+            pages.forEach((page, index) => {
+                const rect = page.getBoundingClientRect();
+                const threshold = windowHeight * 0.3;
+                
+                if (rect.top < threshold && rect.bottom > threshold) {
+                    page.classList.add('visible');
+                    updateDockActive(index);
+                }
+            });
+
+            const totalHeight = document.body.scrollHeight - windowHeight;
+            const progress = (scrollTop / totalHeight) * 100;
+            scrollProgress.style.width = Math.min(progress, 100) + '%';
+        }
+
+        function updateDockActive(index) {
+            if (currentPageIndex !== index) {
+                dockIcons.forEach((icon, i) => {
+                    icon.classList.toggle('active', i === index);
+                });
+                currentPageIndex = index;
+            }
+        }
+
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start' 
+                });
+            }
+        }
+
+        dockIcons.forEach((icon, index) => {
+            icon.addEventListener('click', () => {
+                const pageId = icon.dataset.page;
+                scrollToSection(pageId);
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (isScrolling) return;
+
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                if (currentPageIndex < pages.length - 1) {
+                    const nextPage = pages[currentPageIndex + 1];
+                    scrollToSection(nextPage.id);
+                }
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (currentPageIndex > 0) {
+                    const prevPage = pages[currentPageIndex - 1];
+                    scrollToSection(prevPage.id);
+                }
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            if (!isScrolling) {
+                requestAnimationFrame(updatePageVisibility);
+            }
+        });
+
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            isScrolling = true;
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 150);
+        });
+
+        updatePageVisibility();
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-30% 0px -30% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        pages.forEach(page => {
+            observer.observe(page);
+        });
+    </script>
+</body>
+</html>
